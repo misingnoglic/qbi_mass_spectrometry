@@ -1,10 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Sep 18 20:54:51 2018
-
-@author: zqwu
-"""
 # -*- coding: utf-8 -*-
 """
 Spyder Editor
@@ -27,7 +20,7 @@ class Config:
     lr = 0.0002
     batch_size = 8
     max_epoch = 50
-    gpu = False # use gpu or not
+    gpu = True
     
 opt=Config()
 
@@ -75,7 +68,7 @@ net = TestModel(input_dim=24,
                 hidden_dim_attention=32,
                 n_lstm_layers=2,
                 n_attention_heads=8,
-                gpu=False)
+                gpu=opt.gpu)
 trainer = Trainer(net, opt)
 all_input = [(_X, _y) for _X, _y in zip(Xs, ys)]
 n_train_samples = int(len(all_input) * 0.8)
