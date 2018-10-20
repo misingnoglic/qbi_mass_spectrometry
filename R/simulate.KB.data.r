@@ -10,7 +10,7 @@
 ## Output:
 ## column of mz: 300-2000 real
 ## intensity: 0-1 scale
-## ion: one hot for two letters
+## ion: indicator for two letters
 ## position: integer for number, 1-L (30)
 ## chem_loss: one hot for 17, 44, 43, etc (say 5)
 ## charge: integer 1-6
@@ -41,24 +41,42 @@ seq_string <- function(num_aa, seq_length){
   st
 }
 
+## function to turn a vector into a list string
+list_string <- function(vec){
+  st <- paste(vec, collapse=',')
+  st <- paste0('[', st, ']')
+  st
+}
 
-## set up simulated training input for 1000 peptide sequences
+
+## set up simulated training input for 100 peptide sequences
 set.seed(29387429)
 
-sim.in <- data.frame(acetyl=sample(c(0,1), 1000, replace=T),
+sim.in <- data.frame(seq_id=1:100,
+                     acetyl=sample(c(0,1), 100, replace=T),
                      name=seq_string(25, 50),
-                     charge=sample(c(1:6), 1000, replace=T),
-                     precursor=runif(1000, 300, 2000))
+                     charge=sample(c(1:6), 100, replace=T),
+                     precursor=runif(100, 300, 2000))
 
-sim.out <- data.frame(mz=runif(1000, 300, 2000),
-                      intensity=runif(1000, 0, 1),
-                      ion=sample(c(0,1), 1000, replace=T),
-                      position=sample(c(1:49), 1000, replace=T),
-                      chem_loss=sample(c(0:3), 1000, replace=T),
-                      charge=sample(c(1:6), 1000, replace=T),
-                      delta=runif(1000, -.99, .99))
+sim.out <- NA
 
-write.table(sim.in, paste0(datDir, "sim.input.csv"), sep=',', row.names=F, col.names=T)
-write.table(sim.out, paste0(datDir, "sim.output.csv"), sep=',', row.names=F, col.names=T)
+## simulating 300 mz values per sequence
+for (i in 1:100){
+  tmp.out <- data.frame(mz=list_string(round(runif(300, 300, 2000),digits=3)),
+                      intensity=list_string(round(runif(300, 0, 1),digits=3)),
+                      ion=list_string(sample(c(0,1), 300, replace=T)),
+                      position=list_string(sample(c(1:49), 300, replace=T)),
+                      neutral_loss=list_string(sample(c(0:3), 300, replace=T)),
+                      charge=list_string(sample(c(1:6), 300, replace=T)),
+                      delta=list_string(round(runif(300, -.99, .99),digits=3)))
+  #tmp.out <- tmp.out[order(tmp.out$mz),]
+  sim.out <- rbind(sim.out, tmp.out)
+}
+sim.out <- sim.out[-1,]
 
+#write.table(sim.in[which(sim.in$seq_id <= 100),], paste0(datDir, "sim.input.csv"), sep=',', row.names=F, col.names=T)
+#write.table(sim.out[which(sim.out$seq_id <= 100),], paste0(datDir, "sim.output.csv"), sep=',', row.names=F, col.names=T)
+
+sim.data <- cbind(sim.in, sim.out)
+write.table(sim.data, paste0(datDir, "sim.data.csv"), sep=',', row.names=F, col.names=T)
 
