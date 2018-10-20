@@ -4,6 +4,7 @@ from collections import Counter
 
 beginning_modifier_regex = r"^[a-z]\[\d+\]"
 middle_modifier_regex = r"[A-Z]\[\d+\]"
+position_regex = r"^[by](?P<position>\d+)"
 charge_regex = r"\^(?P<charge>[\d])+"
 neutral_loss_regex = r"[by][\d]+-(?P<neutral_loss>[\d]+)"
 delta_regex = r"\/(?P<delta>-?[0-9]\d*\.*\d*)$"
@@ -19,6 +20,7 @@ csv_output_rows = [
     'mz',
     'intensity',
     'ion',
+    'position',
     'neutral_loss',
     'ion_charge',
     'delta',
@@ -105,6 +107,7 @@ with open("example.KB.sptxt") as spec_data_file, open("output.csv", "w", newline
                 ion_charges = []
                 neutral_losses = []
                 deltas = []
+                positions = []
 
                 for data in current_chunk[8:]:
                     mz, intensity, ion_data = data.split()
@@ -114,6 +117,9 @@ with open("example.KB.sptxt") as spec_data_file, open("output.csv", "w", newline
                     if "i" in ion_data:
                         continue
                     ion_indicator_code = indicator_codes.index(ion_data[0])
+                    position_search = re.search(position_regex, ion_data)
+                    position = int(position_search.group("position"))
+                    positions.append(position)
                     charge_search = re.search(charge_regex, ion_data)
                     if charge_search:
                         ion_charge = int(charge_search.group("charge"))
@@ -144,6 +150,7 @@ with open("example.KB.sptxt") as spec_data_file, open("output.csv", "w", newline
                     'mz': m_over_z,
                     'intensity': intensities,
                     'ion': ions,
+                    'position': positions,
                     'neutral_loss': neutral_losses,
                     'ion_charge': ion_charges,
                     'delta': deltas,
