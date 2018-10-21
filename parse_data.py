@@ -129,7 +129,7 @@ def create_annoying_string(row_data, row_id):
     :return: old string.
     """
     # Do some conversions
-    acetyl = int(row_data['acetyl']) == 1
+    acetyl = str(row_data['acetyl']) == "True"
     name_one_hot_encoded = eval(str(row_data['name']))
     charge = int(row_data['charge'])
     precursor = float(row_data['precursor'])
