@@ -16,9 +16,14 @@
       function getData() {
           var url = new URL(window.location.href);
           var protein_str = decodeURIComponent(url.searchParams.get("protein_name"));
+          var csvdldiv = document.getElementById('column_download_csv');
+          csvdldiv.href="/output_csv?protein_name="+protein_str;
 
           // URL for the API in Flask
           const dataURL = "/output_json?protein_name="+protein_str;
+          var jsondiv = document.getElementById('column_json');
+          jsondiv.href=dataURL;
+
           const request = new XMLHttpRequest();
           request.onload = function() {
               drawChart(this.response);
@@ -55,6 +60,7 @@
           curveType: 'none',
           hAxis: {title: 'm/z'},
           vAxis: {title: 'intensity'},
+          colors: ['#546C8C']
         };
 
         var scatter_options = {
@@ -94,6 +100,13 @@
     <a id="column_download_html" href="it hasn't loaded yet" style="align:center;" download>
       <button class="btn btn-primary btn-lg" type="submit"><i class="fa fa-download"></i>Download</button>
     </a>
+    <a id="column_download_csv" href="it hasn't loaded yet" style="align:center;" download>
+      <button class="btn btn-primary btn-lg" type="submit"><i class="fa fa-download"></i>Download CSV</button>
+    </a>
+    <a id="column_json" href="it hasn't loaded yet" style="align:center;">
+      <button class="btn btn-primary btn-lg" type="submit"><i class="fa fa-download"></i>View JSON</button>
+    </a>
+
     <img id="matplotlib_graph" src="data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAAUA
 AAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO
     9TXL0Y4OHwAAAABJRU5ErkJggg==" alt="graph" style="width: 1400px;" />

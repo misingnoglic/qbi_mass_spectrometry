@@ -4,12 +4,13 @@ from scripts.biLSTM import BiLSTM, MultiheadAttention
 from scripts.models import TestModel
 from scripts.trainer import Trainer
 import numpy as np
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, make_response
 from parse_data import amino_acid_name_parse
 from calculate_frag_mz import get_frag_mz
 import matplotlib.pyplot as plt
 import base64
 import io
+import csv
 
 app = Flask(__name__)
 
@@ -50,8 +51,30 @@ def output_json():
         'positions': positions,
         'b64_image': image,
     }
-    #image = generate_chart(mz_data, intensities, ion_types, positions)
     return jsonify(d)
+
+@app.route('/output_csv')
+def output_csv():
+    protein_name = request.args.get('protein_name')
+    has_beginning_charge, name_one_hot_encoded, charge = amino_acid_name_parse(protein_name)
+    mz_data, intensities, ion_types, positions = get_prediction(has_beginning_charge, name_one_hot_encoded, charge)
+    positions = [int(x) for x in positions]
+    fake_csv = io.StringIO()
+    fieldnames = ['m/z', 'intensity','ion type','position']
+    writer = csv.DictWriter(fake_csv, fieldnames=fieldnames)
+    writer.writeheader()
+    for mz,intensity,ion_type,position in zip(mz_data, intensities, ion_types, positions):
+        writer.writerow({
+            'm/z':mz,
+            'intensity':intensity,
+            'ion type': ion_type,
+            'position': position,
+        })
+    output = make_response(fake_csv.getvalue())
+    output.headers["Content-Disposition"] = "attachment; filename=export.csv"
+    output.headers["Content-type"] = "text/csv"
+    return output
+
 
 def generate_chart(mz_data, intensities, ion_types, positions):
     fig, ax = plt.subplots(figsize=(16, 6),
