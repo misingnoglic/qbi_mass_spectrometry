@@ -35,15 +35,18 @@ def reverse_one_hot_encode(vectors, code):
     return "".join(letters)
   
 def get_frag_mz(one_hot, ion_position, ion_type, ion_charge):
-  ## go from one hot back to our custom code 
   pep_seq = reverse_one_hot_encode(one_hot, amino_acid_modified_codes)
   
   if (ion_type == 'b'):
     ion_seq = pep_seq[:ion_position]
   elif (ion_type == 'y'):
     ion_seq = pep_seq[-ion_position:]
-  
-  mz = mass.calculate_mass(sequence=ion_seq, ion_type=ion_type, charge=int(ion_charge))
+
+  # # TODO: Figure out how to use aacomp
+  count = ion_seq.count("!")
+  ion_seq =ion_seq.replace("!", "C")
+  mz = mass.calculate_mass(sequence=ion_seq, ion_type=ion_type, charge=int(ion_charge), aa_comp=aa_comp)
+  mz += count * float(2*12 + 1 + 14)/int(ion_charge)
   return mz
 
 
