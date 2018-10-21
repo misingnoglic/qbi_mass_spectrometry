@@ -9,7 +9,7 @@ from torch import nn
 import torch as t
 import torch.nn.functional as F
 import numpy as np
-from biLSTM import BiLSTM, MultiheadAttention, CombinedConv1D
+from scripts.biLSTM import BiLSTM, MultiheadAttention, CombinedConv1D
 
 def CELoss(labels, outs, batch_size=8):
   logits = outs.transpose(0, 1).contiguous().view(batch_size, -1)

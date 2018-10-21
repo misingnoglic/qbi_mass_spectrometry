@@ -14,7 +14,7 @@ from torch.optim import Adam
 from copy import deepcopy
 import numpy as np
 from sklearn.metrics import r2_score
-from models import CELoss
+from scripts.models import CELoss
 from torch.utils.data import Dataset, DataLoader
 import os
 
