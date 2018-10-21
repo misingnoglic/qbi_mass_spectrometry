@@ -80,6 +80,11 @@ def get_prediction(has_beginning_charge, name_one_hot_encoded, charge):
           pos = position + 1
         mz_data.append(get_frag_mz(name_one_hot_encoded, pos, ion_type, charge))
         intensities.append(pred[position, peak_type] * total_intensities)
+
+    # Sort the data now
+    zipped_data = list(zip(mz_data, intensities))
+    zipped_data.sort(key=lambda x: x[0])
+    mz_data, intensities = zip(*zipped_data)
     return mz_data, intensities
 
 
