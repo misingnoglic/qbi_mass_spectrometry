@@ -26,7 +26,7 @@ n_charges = 7
 
 @app.route('/')
 def home():
-    return render_template("index.html")
+    return render_template("index_fancy.html")
 
 
 @app.route('/graph')
@@ -142,7 +142,9 @@ def get_prediction_fake_label(a1, a2, a3):
          568.8, 10000. ,    44. ,   170. ,    62.5,  1017.4,    56.5,
           55.3,  2614.4,   196.6,   111.6,  5127.3,    21. ,   517.8,
           21.4]
-  return mzs, intensities
+  ion_types = [0 for x in intensities]
+  positions = [0 for x in intensities]
+  return mzs, intensities, ion_types, positions
 
 def get_prediction_fake_prediction(a1, a2, a3):
   mzs = [203.11026147425002,
@@ -175,6 +177,9 @@ def get_prediction_fake_prediction(a1, a2, a3):
  2592.2845806255937,
  5185.784757831693,
  653.2522977134213]
-  return mzs, intensities
+  ion_types = [0 for x in intensities]
+  positions = [0 for x in intensities]
+  return mzs, intensities, ion_types, positions
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
