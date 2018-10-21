@@ -60,7 +60,7 @@ def reverse_one_hot_encode(vectors, code):
 
 def reverse_amino_acid_coding(vectors, has_beginning_modifier=False):
     """
-    Reverse one hot encoding for 
+    Reverse one hot encoding and character substitutions for amino acids.
     :param vectors: one hot encoded vectors
     :param has_beginning_modifier: If it should have the n[43] in front
     :return: original amino acid name string
