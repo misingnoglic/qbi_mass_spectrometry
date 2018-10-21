@@ -71,7 +71,7 @@ class Trainer(object):
     t.save(self.net.state_dict(), path)
   
   def load(self, path):
-    s_dict = t.load(path)
+    s_dict = t.load(path, map_location=lambda storage, loc: storage)
     self.net.load_state_dict(s_dict)
   
   def train(self, train_data, n_epochs=None, **kwargs):
