@@ -1,9 +1,24 @@
 # Code to serve website
 
+from scripts.biLSTM import BiLSTM, MultiheadAttention
+from scripts.models import TestModel
+from scripts.trainer import Trainer
+import numpy as np
 from flask import Flask, render_template, request, jsonify
 from parse_data import amino_acid_name_parse
+from calculate_frag_mz import get_frag_mz
 app = Flask(__name__)
 
+class Config:
+    lr = 0.0001
+    batch_size = 8
+    max_epoch = 50
+    gpu = False
+    
+
+neutral_loss_choices = [0, 17, 18, 35, 36, 44, 46]
+n_neutral_losses = len(neutral_loss_choices)
+n_charges = 7    
 
 @app.route('/')
 def home():
@@ -31,14 +46,45 @@ def output_json():
 
 def get_prediction(has_beginning_charge, name_one_hot_encoded, charge):
     # Hardcoded for now until we can do actual ML
-    mz_data = [129.102, 130.087, 143.082, 147.113, 155.081, 185.092, 214.119, 246.181, 256.129, 284.125, 327.166,
-               377.222,398.204, 444.728, 471.244, 512.233, 605.329, 643.271, 760.883, 784.392, 791.395, 803.738,
-               810.906, 840.419, 846.427, 860.433, 868.425, 870.104, 870.768, 881.943, 888.451, 893.782, 895.947,
-               896.941, 917.463, 941.129, 966.969, 973.977, 1001.984, 1016.48, 1023.512, 1152.044]
-    intensities = [794.5, 627.6, 612.5, 1266.7, 625.9, 4848.7, 455.6, 402.9, 6812.2, 672.6, 3782.6, 543.9, 788.0,
-                   10000.0, 497.4, 423.0, 499.9, 572.2, 1181.6, 613.7, 1795.6, 5255.3, 822.1, 872.3, 5962.4, 1464.9,
-                   394.7, 7227.1, 1058.6, 888.3, 4881.6, 6741.1, 1359.3, 656.7, 1786.9, 607.3, 368.7, 3633.5, 506.2,
-                   548.2, 5230.3, 438.2]
+    
+    opt=Config()
+    net = TestModel(input_dim=24,
+                    n_tasks=2*n_charges,
+                    embedding_dim=256,
+                    hidden_dim_lstm=128,
+                    hidden_dim_attention=32,
+                    n_lstm_layers=2,
+                    n_attention_heads=8,
+                    gpu=opt.gpu)
+    trainer = Trainer(net, opt)
+    
+    trainer.load('./saved_models/model_flipped_bkp.pth')
+    total_intensities = np.random.normal(70000, 20000)  
+    X = np.array(name_one_hot_encoded)
+    inputs = [(X, 
+               (has_beginning_charge*1, charge), 
+               np.zeros((X.shape[0]-1, 2*n_charges)))]
+    pred = trainer.predict(inputs)[0]
+    
+    mz_data = []
+    intensities = []
+    peaks = np.where(pred > 0.005)
+    for position, peak_type in zip(*peaks):
+        b_y = (peak_type >= 7) * 1
+        charge = peak_type - b_y * 7 + 1
+        if b_y:
+          ion_type = 'y'
+          pos = (pred.shape[0] + 1) - position - 1
+        else:
+          ion_type = 'b'
+          pos = position + 1
+        mz_data.append(get_frag_mz(name_one_hot_encoded, pos, ion_type, charge))
+        intensities.append(pred[position, peak_type] * total_intensities)
+
+    # Sort the data now
+    zipped_data = list(zip(mz_data, intensities))
+    zipped_data.sort(key=lambda x: x[0])
+    mz_data, intensities = zip(*zipped_data)
     return mz_data, intensities
 
 
