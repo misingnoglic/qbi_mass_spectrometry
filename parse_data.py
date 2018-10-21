@@ -35,7 +35,6 @@ amino_acid_modifiers = "".join(amino_acid_modifier_replacements.values())
 amino_acid_modified_codes = amino_acid_codes+amino_acid_modifiers
 
 
-
 def one_hot_encode(values, code):
     result = []
     for letter in values:
@@ -44,10 +43,11 @@ def one_hot_encode(values, code):
             assert (sum(letter_encoding) == 1)
         except AssertionError:
             print("One hot encoding failed - unexpected letter in this name")
-            print(name)
+            print(values)
             raise
         result.append(letter_encoding)
     return result
+
 
 def reverse_one_hot_encode(vectors, code):
     letters = []
@@ -57,6 +57,40 @@ def reverse_one_hot_encode(vectors, code):
     return "".join(letters)
 
 # reverse_one_hot_encode(one_hot_encode(values, code), code) should be values.
+
+
+def amino_acid_name_parse(name_str):
+    """
+    :param name_str: name string with beginning charge, amino acids/modifiers, and charge.
+    :return: has_beginning_charge, name, charge
+    """
+    name, charge = name_str.split("/")
+    charge = int(charge)
+    beginning_modifier_search = re.search(beginning_modifier_regex, name)
+
+    if beginning_modifier_search:
+        beginning_modifier_match = beginning_modifier_search.group(0)
+        if beginning_modifier_match != "n[43]":
+            return False, "", 0
+        else:
+            has_beginning_charge = True
+    else:
+        has_beginning_charge = False
+
+    if has_beginning_charge:
+        name = name.replace("n[43]", "")
+
+    for modifier, modifier_code in amino_acid_modifier_replacements.items():
+        # Replace modifiers with our special codes
+        name = name.replace(modifier, modifier_code)
+
+    middle_modifier_search = re.search(middle_modifier_regex, name)
+    if middle_modifier_search:
+        # We found a new modifier that we haven't account for, don't.
+        return False, "", 0
+    name_one_hot_encoded = one_hot_encode(name, amino_acid_modified_codes)
+    return has_beginning_charge, name_one_hot_encoded, charge
+
 
 def reverse_amino_acid_coding(vectors, charge, has_beginning_modifier=False):
     """
@@ -73,6 +107,7 @@ def reverse_amino_acid_coding(vectors, charge, has_beginning_modifier=False):
 
     letters += "/{}".format(charge)
     return letters
+
 
 def create_annoying_string(row_data, row_id):
     """
@@ -94,7 +129,7 @@ def create_annoying_string(row_data, row_id):
     :return: old string.
     """
     # Do some conversions
-    acetyl = int(row_data['acetyl'])==1
+    acetyl = int(row_data['acetyl']) == 1
     name_one_hot_encoded = eval(str(row_data['name']))
     charge = int(row_data['charge'])
     precursor = float(row_data['precursor'])
@@ -117,13 +152,11 @@ def create_annoying_string(row_data, row_id):
         ion = indicator_codes[int(ion)]
         s = f"{mz}\t{intensity}\t{ion}{position}"
         if neutral_loss!=0:
-            s+=f"-{neutral_loss}"
-        if ion_charge!=1:
-            s+=f"^{ion_charge}"
-        s+=f"/{delta}"
+            s += f"-{neutral_loss}"
+        if ion_charge != 1:
+            s += f"^{ion_charge}"
+        s += f"/{delta}"
         ends.append(s)
-
-
 
     return f"""Name: {name}
 LibID: {row_id}
@@ -133,7 +166,6 @@ Status: Normal
 FullName: {name}
 Comment: No Comment
 NumPeaks: {len(intensities)}\n"""+"\n".join(ends)+"\n"
-
 
 
 def main():
@@ -159,33 +191,9 @@ def main():
                         break
 
                     name_str = current_chunk[0].split(" ")[1]
-                    name, charge = name_str.split("/")
-                    charge = int(charge)
-                    beginning_modifier_search = re.search(beginning_modifier_regex, name)
-
-                    if beginning_modifier_search:
-                        beginning_modifier_match = beginning_modifier_search.group(0)
-                        if beginning_modifier_match != "n[43]":
-                            break # Don't include this sample
-                        else:
-                            has_beginning_charge = True
-                    else:
-                        has_beginning_charge = False
-
-                    if has_beginning_charge:
-                        name = name.replace("n[43]", "")
-
-                    for modifier, modifier_code in amino_acid_modifier_replacements.items():
-                        # Replace modifiers with our special codes
-                        name = name.replace(modifier, modifier_code)
-
-                    middle_modifier_search = re.search(middle_modifier_regex, name)
-                    if middle_modifier_search:
-                        # We found a new modifier that we haven't account for, don't.
-                        break
-                    # middle_modifiers = re.findall(middle_modifier_regex, name)
-                    # middle_modifiers_all.extend(middle_modifiers)
-                    name_one_hot_encoded = one_hot_encode(name, amino_acid_modified_codes)
+                    print(name_str)
+                    # Parse data from name.
+                    has_beginning_charge, name_one_hot_encoded, charge = amino_acid_name_parse(name_str)
 
                     precursor_mz_line = current_chunk[3]
                     try:
@@ -251,7 +259,6 @@ def main():
                         'ion_charge': ion_charges,
                         'delta': deltas,
                     }
-                    print(row_dictionary)
                     assert len(m_over_z)==len(intensities)==len(ions)==len(neutral_losses)==len(ion_charges)==len(deltas)
                     writer.writerow(row_dictionary)
                     break
@@ -260,5 +267,5 @@ def main():
             if not read:
                 break
 
-if __name__=="__main__":
+if __name__ == "__main__":
     main()
