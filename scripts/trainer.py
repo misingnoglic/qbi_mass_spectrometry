@@ -45,21 +45,25 @@ class Trainer(object):
       batch = data[i * batch_size:min((i+1) * batch_size, len(data))]
       batch_length = max([sample[0].shape[0] for sample in batch])
       out_batch_X = []
+      out_batch_X_metas = []
       out_batch_y = []
       for sample in batch:
         sample_length = sample[0].shape[0]
         X = deepcopy(sample[0][:])
-        y = deepcopy(sample[1][:])
+        y = deepcopy(sample[2][:])
         out_batch_X.append(np.pad(X, ((0, batch_length - sample_length), (0, 0)), 'constant'))
+        out_batch_X_metas.append(sample[1])
         out_batch_y.append(np.pad(y, ((0, batch_length - sample_length), (0, 0)), 'constant'))
         assert X.shape[0] - y.shape[0] == 1
         
       if len(batch) < batch_size:
         pad_length = batch_size - len(batch)
         out_batch_X.extend([out_batch_X[0]] * pad_length)
+        out_batch_X_metas.extend([out_batch_X_metas[0]] * pad_length)
         out_batch_y.extend([out_batch_y[0]] * pad_length)
         
       data_batches.append((np.stack(out_batch_X, axis=1), 
+                           np.stack(out_batch_X_metas, axis=0), 
                            np.stack(out_batch_y, axis=1)))
     return data_batches
   
@@ -99,11 +103,13 @@ class Trainer(object):
       print ('start epoch {epoch}'.format(epoch=epoch))
       for batch in data_batches:
         X = Variable(t.from_numpy(batch[0])).float()
-        y = Variable(t.from_numpy(batch[1])).float()
+        X_metas = Variable(t.from_numpy(batch[1])).float()
+        y = Variable(t.from_numpy(batch[2])).float()
         if self.opt.gpu:
           X = X.cuda()
+          X_metas = X_metas.cuda()
           y = y.cuda()
-        output = self.net(X, self.opt.batch_size)
+        output = self.net(X, X_metas, self.opt.batch_size)
         error = self.criterion(y, output, self.opt.batch_size)
         loss += error
         error.backward()
@@ -117,9 +123,11 @@ class Trainer(object):
     preds = []
     for sample in test_batches:
       X = Variable(t.from_numpy(sample[0])).float()
-      y = Variable(t.from_numpy(sample[1])).float()
+      X_metas = Variable(t.from_numpy(sample[1])).float()
+      y = Variable(t.from_numpy(sample[2])).float()
       if self.opt.gpu:
         X = X.cuda()
+        X_metas = X_metas.cuda()
         y = y.cuda()
-      preds.append(self.net.predict(X, 1, self.opt.gpu))
+      preds.append(self.net.predict(X, X_metas, 1, self.opt.gpu))
     return preds

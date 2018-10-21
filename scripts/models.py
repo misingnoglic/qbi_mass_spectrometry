@@ -39,7 +39,7 @@ class TestModel(nn.Module):
     self.gpu = gpu
 
     self.embedding_module = t.nn.Embedding(self.input_dim, self.embedding_dim)
-    self.lstm_module = BiLSTM(input_dim=self.embedding_dim,
+    self.lstm_module = BiLSTM(input_dim=self.embedding_dim + 2,
                               hidden_dim=self.hidden_dim_lstm,
                               n_layers=self.n_lstm_layers,
                               gpu=self.gpu)
@@ -54,10 +54,14 @@ class TestModel(nn.Module):
         nn.ReLU(True),
         nn.Linear(64, self.n_tasks))
 
-  def forward(self, sequence, batch_size=1):
+  def forward(self, sequence, metas, batch_size=1):
     # sequence of shape: seq_len * batch_size
     embedded_inputs = t.matmul(sequence, self.embedding_module.weight)
-    lstm_outs = self.lstm_module(embedded_inputs, batch_size=batch_size)
+    seq_len = embedded_inputs.shape[0]
+    metas = metas.view(1, *metas.shape).repeat(seq_len, 1, 1)
+    
+    lstm_inputs = t.cat([embedded_inputs, metas], 2)
+    lstm_outs = self.lstm_module(lstm_inputs, batch_size=batch_size)
     attention_outs = self.att_module(sequence=lstm_outs)
     #conv_outs = self.conv_module(lstm_outs)
     intervals = t.cat([attention_outs[1:], attention_outs[:-1]], 2)
@@ -65,9 +69,9 @@ class TestModel(nn.Module):
     # outs of shape: (seq_len - 1) * batch_size * n_tasks
     return outs
 
-  def predict(self, sequence, batch_size=1, gpu=True):
+  def predict(self, sequence, metas, batch_size=1, gpu=True):
     assert batch_size == 1
-    output = self.forward(sequence, 1)[:, 0, :]
+    output = self.forward(sequence, metas, 1)[:, 0, :]
     output_shape = output.shape
     logits = output.view(-1)
     log_prob = F.log_softmax(logits, 0)

@@ -29,7 +29,7 @@ def evaluate(inputs, preds, thr=0.005):
   precisions = []
   recalls = []
   for inp, pred in zip(inputs, preds):
-    label = inp[1]
+    label = inp[2]
     _label = label > thr
     _pred = pred > thr
     precisions.append(precision_score(_label.flatten(), _pred.flatten()))
@@ -87,7 +87,7 @@ net = TestModel(input_dim=24,
                 n_attention_heads=8,
                 gpu=opt.gpu)
 trainer = Trainer(net, opt)
-all_input = [(_X, _y) for _X, _y in zip(Xs, ys)]
+all_input = [(_X, _X_meta, _y) for _X, _X_meta, _y in zip(Xs, X_metas, ys)]
 n_train_samples = int(len(all_input) * 0.8)
 train_input = all_input[:n_train_samples]
 test_input = all_input[n_train_samples:]
