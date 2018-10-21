@@ -1,5 +1,6 @@
 name: spectranet
 channels:
+  - conda-forge
   - anaconda
   - pytorch
   - bioconda
@@ -9,13 +10,22 @@ dependencies:
   - certifi=2018.10.15=py37_0
   - numpy=1.15.2=py37h6a91979_1
   - openssl=1.0.2p=h1de35cc_0
+  - scikit-learn=0.20.0=py37h4f467ca_1
   - scipy=1.1.0=py37h28f7352_1
   - libffi=3.2.1=1
+  - pyteomics=3.5.1=py_2
+  - cycler=0.10.0=py_1
+  - kiwisolver=1.0.1=py37h2d50403_2
+  - matplotlib=3.0.0=py37h45c993b_1
+  - pyparsing=2.2.2=py_0
+  - python-dateutil=2.7.3=py_0
+  - tornado=5.1.1=py37h470a237_0
   - blas=1.0=mkl
   - cffi=1.11.5=py37h6174b99_1
   - click=7.0=py37_0
   - flask=1.0.2=py37_1
   - freetype=2.9.1=hb4e5f40_0
+  - icu=58.2=h4b95b61_1
   - intel-openmp=2019.0=118
   - itsdangerous=0.24=py37_1
   - jinja2=2.10=py37_0
@@ -24,8 +34,12 @@ dependencies:
   - libcxxabi=4.0.1=hebd6815_0
   - libedit=3.1.20170329=hb402a30_2
   - libgfortran=3.0.1=h93005f0_2
+  - libiconv=1.15=hdd342a3_7
   - libpng=1.6.35=ha441bb4_0
   - libtiff=4.0.9=hcb84e12_2
+  - libxml2=2.9.8=hab757c2_1
+  - libxslt=1.1.32=hb819dd2_0
+  - lxml=4.2.5=py37hef8c89e_0
   - markupsafe=1.0=py37h1de35cc_1
   - mkl=2019.0=118
   - mkl_fft=1.0.6=py37hb8a8100_0
@@ -34,13 +48,16 @@ dependencies:
   - ninja=1.8.2=py37h04f5b5a_1
   - numpy-base=1.15.2=py37h8a80b8c_1
   - olefile=0.46=py37_0
+  - pandas=0.23.4=py37h6440ff4_0
   - pillow=5.3.0=py37hb68e598_0
   - pip=10.0.1=py37_0
   - pycparser=2.19=py37_0
   - python=3.7.0=hc167b69_0
+  - pytz=2018.5=py37_0
   - readline=7.0=h1de35cc_5
   - setuptools=40.4.3=py37_0
   - six=1.11.0=py37_1
+  - sqlalchemy=1.2.12=py37h1de35cc_0
   - sqlite=3.25.2=ha441bb4_0
   - tk=8.6.8=ha441bb4_0
   - werkzeug=0.14.1=py37_0
