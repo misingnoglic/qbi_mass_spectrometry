@@ -51,7 +51,7 @@
 
 body {
   color: #777777;
-  font-family: "Poppins", sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 14px;
   font-weight: 300;
   line-height: 1.5em;
@@ -119,7 +119,7 @@ a, a:focus, a:hover {
 
 h1, h2, h3,
 h4, h5, h6 {
-  font-family: "Poppins", sans-serif;
+  font-family: "Poiret One", cursive;
   color: #222222;
   line-height: 1.5em;
   margin-bottom: 0;
@@ -1844,10 +1844,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .default-header {
-  padding: 20px 60px;
+  padding: 40px 80px;
   position: absolute;
-  top: 0;
-  left: 0;
+  top: 50px;
+  left: 12px;
   width: 100%;
   z-index: 9;
 }
@@ -2604,4 +2604,15 @@ nav a:hover {
 
 .switch-wrap p {
   margin: 0;
+}
+
+.corner_logo{
+  width: 200px;
+  height: 75%;
+}
+
+.org_logo{
+  width: 300px;
+  padding: 10px
+  height: 100%;
 }
