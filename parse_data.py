@@ -40,6 +40,14 @@ def one_hot_encode(values, code):
         result.append(letter_encoding)
     return result
 
+def reverse_one_hot_encode(vectors, code):
+    letters = []
+    for vector in vectors:
+        i = vector.index(1)  # get the index of the item which is 1
+        letters.append(code[i])
+    return "".join(letters)
+
+# reverse_one_hot_encode(one_hot_encode(values, code), code) should be values.
 
 with open("example.KB.sptxt") as spec_data_file, open("output.csv", "w", newline='') as csv_output_file:
     writer = csv.DictWriter(csv_output_file, fieldnames=csv_output_rows)
