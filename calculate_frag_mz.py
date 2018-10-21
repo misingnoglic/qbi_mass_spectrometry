@@ -43,7 +43,7 @@ def get_frag_mz(one_hot, ion_position, ion_type, ion_charge):
   elif (ion_type == 'y'):
     ion_seq = pep_seq[-ion_position:]
   
-  mz = mass.calculate_mass(sequence=ion_seq, ion_type=ion_type, charge=ion_charge)
+  mz = mass.calculate_mass(sequence=ion_seq, ion_type=ion_type, charge=int(ion_charge))
   return mz
 
 
