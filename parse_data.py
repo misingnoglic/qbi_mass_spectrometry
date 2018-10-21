@@ -8,9 +8,6 @@ position_regex = r"^[by](?P<position>\d+)"
 charge_regex = r"\^(?P<charge>[\d])+"
 neutral_loss_regex = r"[by][\d]+-(?P<neutral_loss>[\d]+)"
 delta_regex = r"\/(?P<delta>-?[0-9]\d*\.*\d*)$"
-amino_acid_codes = "ACDEFGHIKLMNPQRSTVWY"
-amino_acid_modifiers = "!@#$"
-amino_acid_modified_codes = amino_acid_codes+amino_acid_modifiers
 indicator_codes = "by"
 csv_output_rows = [
     'acetyl',
@@ -25,6 +22,18 @@ csv_output_rows = [
     'ion_charge',
     'delta',
 ]
+
+amino_acid_modifier_replacements = {
+    "C[160]": "!",
+    "M[147]": "@",
+    "Q[129]": "#",
+    "N[115]": "$",
+}
+
+amino_acid_codes = "ACDEFGHIKLMNPQRSTVWY"
+amino_acid_modifiers = list(amino_acid_modifier_replacements.values())
+amino_acid_modified_codes = amino_acid_codes+amino_acid_modifiers
+
 
 
 def one_hot_encode(values, code):
@@ -48,6 +57,20 @@ def reverse_one_hot_encode(vectors, code):
     return "".join(letters)
 
 # reverse_one_hot_encode(one_hot_encode(values, code), code) should be values.
+
+def reverse_amino_acid_coding(vectors, has_beginning_modifier=False):
+    """
+    Reverse one hot encoding for 
+    :param vectors: one hot encoded vectors
+    :param has_beginning_modifier: If it should have the n[43] in front
+    :return: original amino acid name string
+    """
+    letters = reverse_one_hot_encode(vectors, amino_acid_modified_codes)
+    if has_beginning_modifier:
+        letters = "n[43]"+letters
+    for modifier, code in amino_acid_modifier_replacements:
+        letters = letters.replace(code, modifier)
+    return letters
 
 with open("example.KB.sptxt") as spec_data_file, open("output.csv", "w", newline='') as csv_output_file:
     writer = csv.DictWriter(csv_output_file, fieldnames=csv_output_rows)
@@ -87,10 +110,10 @@ with open("example.KB.sptxt") as spec_data_file, open("output.csv", "w", newline
                 if has_beginning_charge:
                     name = name.replace("n[43]", "")
 
-                name = name.replace("C[160]", "!")
-                name = name.replace("M[147]", "@")
-                name = name.replace("Q[129]", "#")
-                name = name.replace("N[115]", "$")
+                for modifier, modifier_code in amino_acid_modifier_replacements.items():
+                    # Replace modifiers with our special codes
+                    name = name.replace(modifier, modifier_code)
+
                 middle_modifier_search = re.search(middle_modifier_regex, name)
                 if middle_modifier_search:
                     # We found a new modifier that we haven't account for, don't.
