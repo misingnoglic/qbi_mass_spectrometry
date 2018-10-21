@@ -25,6 +25,12 @@ def home():
     return render_template("index.html")
 
 
+@app.route('/graph')
+def graph():
+    return render_template("html_graph_test.html")
+
+
+
 @app.route('/output_json')
 def output_json():
     protein_name = request.args.get('protein_name')
