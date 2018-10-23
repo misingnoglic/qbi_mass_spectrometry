@@ -1,6 +1,8 @@
 # qbi_mass_spectrometry
 Project for 2018 QBI Hackathon
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1469732.svg)](https://doi.org/10.5281/zenodo.1469732)
+
 [Project Slides link](https://docs.google.com/presentation/d/17TRaUvE4mK7D0b4Vhk5TQQrgMYXrxbx80U_s4TEl7ro/edit#slide=id.g44aca8a55f_3_8)
 
 [Synthetic Peptide Files](https://drive.google.com/drive/u/1/folders/19WlyREvMSJO0nS80i8XNdeO0a5l6AdKQ)
