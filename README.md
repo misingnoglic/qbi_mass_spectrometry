@@ -15,13 +15,15 @@ Requirements: Conda Installation with Python 3
 
 Note, if this conda environment does not install, just install the following packages on conda:
 
-1. flask
-2. numpy
-3. scipy
-4. scikit-learn
-5. pytorch
-6. pyteomics
-7. matplotlib
+```
+flask
+numpy
+scipy
+scikit-learn
+pytorch
+pyteomics
+matplotlib
+```
 
 2. Run the `website.py` file with Python.
 
