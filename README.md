@@ -5,6 +5,29 @@ Project for 2018 QBI Hackathon
 
 [Synthetic Peptide Files](https://drive.google.com/drive/u/1/folders/19WlyREvMSJO0nS80i8XNdeO0a5l6AdKQ)
 
+# How to run locally
+
+Requirements: Conda Installation with Python 3
+
+0. Clone this repo to your local machine
+
+1. Create and source the conda environment with the instructions [here:] (https://conda.io/docs/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file)
+
+Note, if this conda environment does not install, just install the following packages on conda:
+
+1. flask
+2. numpy
+3. scipy
+4. scikit-learn
+5. pytorch
+6. pyteomics
+7. matplotlib
+
+2. Run the `website.py` file with Python.
+
+3. You should be able to go to localhost and see the results!
+
+
 # Contributors:
 
 - Arya Boudaie (arya@aryaboudaie.com)
