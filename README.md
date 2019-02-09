@@ -13,7 +13,7 @@ Requirements: Conda Installation with Python 3
 
 0. Clone this repo to your local machine
 
-1. Create and source the conda environment with the instructions [here:] (https://conda.io/docs/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file)
+1. Create and source the conda environment with the instructions [here](https://conda.io/docs/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file)
 
 Note, if this conda environment does not install, just install the following packages on conda:
 
